@@ -36,16 +36,47 @@ func (cwb cwbDataSource) loadDataSet(dataId string) (result cwbDataSet) {
 	return
 }
 
-type weatherElement struct {
-	ElementName  string `xml:"elementName"`
-	ElementValue string `xml:"elementValue>value"`
+type rawWeatherElement struct {
+	ElementName  string  `xml:"elementName"`
+	ElementValue float64 `xml:"elementValue>value"`
 }
 
-type stationLocation struct {
-	LocationName    string           `xml:"locationName"`
-	WeatherElements []weatherElement `xml:"weatherElement"`
+type stationStatus struct {
+	LocationName    string
+	WeatherElements map[string]float64
 }
 
-type xmlStationsStatus struct {
-	Location stationLocation `xml:"location"`
+type rawStationStatus struct {
+	LocationName      string              `xml:"locationName"`
+	RawWeatherElement []rawWeatherElement `xml:"weatherElement"`
+}
+
+type rawStationList struct {
+	Locations []rawStationStatus `xml:"location"`
+}
+
+type stationList struct {
+	Locations []stationStatus
+}
+
+func (raw *rawStationList) Convert() *stationList {
+	list := make([]stationStatus, 11)
+	for _, rawElem := range raw.Locations {
+		list = append(list, rawElem.Convert())
+	}
+	return &stationList{list}
+}
+
+func (status *rawStationStatus) Convert() (converted stationStatus) {
+	converted.LocationName = status.LocationName
+	converted.WeatherElements = status.ToMap()
+	return
+}
+
+func (status rawStationStatus) ToMap() (elemMap map[string]float64) {
+	elemMap = make(map[string]float64)
+	for _, element := range status.RawWeatherElement {
+		elemMap[element.ElementName] = element.ElementValue
+	}
+	return
 }
