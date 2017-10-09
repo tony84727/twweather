@@ -2,6 +2,7 @@ package twweather
 
 import (
 	"encoding/xml"
+	"reflect"
 )
 
 const StationStatusDataId = "O-A0001-001"
@@ -17,6 +18,15 @@ func New(cwbAPIKey string) *Weather {
 	weather := new(Weather)
 	weather.cwbDataSource = &cwbDataSource{cwbAPIKey}
 	return weather
+}
+
+func (weather *Weather) GetAvailableStationName() []string {
+	keys := reflect.ValueOf(weather.stationStatus.Locations).MapKeys()
+	names := make([]string, len(keys))
+	for i := 0; i < len(keys); i++ {
+		names[i] = keys[i].String()
+	}
+	return names
 }
 
 func (weather *Weather) LoadStationStatus() (err error) {

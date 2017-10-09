@@ -15,16 +15,16 @@ type cwbDataSource struct {
 
 type cwbDataSet struct {
 	RawData []byte
-	DataId  string
+	DataID  string
 }
 
 func initDataSource(apiKey string) cwbDataSource {
 	return cwbDataSource{APIKey: apiKey}
 }
 
-func (cwb cwbDataSource) loadDataSet(dataId string) (result cwbDataSet) {
-	result = cwbDataSet{DataId: dataId}
-	response, err := http.Get(fmt.Sprintf("%s?dataid=%s&authorizationKey=%s", ApiUrl, dataId, cwb.APIKey))
+func (cwb cwbDataSource) loadDataSet(dataID string) (result cwbDataSet) {
+	result = cwbDataSet{DataID: dataID}
+	response, err := http.Get(fmt.Sprintf("%s?dataid=%s&authorizationKey=%s", ApiUrl, dataID, cwb.APIKey))
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -56,13 +56,13 @@ type rawStationList struct {
 }
 
 type stationList struct {
-	Locations []stationStatus
+	Locations map[string]stationStatus
 }
 
 func (raw *rawStationList) Convert() *stationList {
-	list := make([]stationStatus, 11)
+	list := make(map[string]stationStatus, 11)
 	for _, rawElem := range raw.Locations {
-		list = append(list, rawElem.Convert())
+		list[rawElem.LocationName] = rawElem.Convert()
 	}
 	return &stationList{list}
 }

@@ -35,3 +35,11 @@ func TestParseStationStatus(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestGetAvailableStationName(t *testing.T) {
+	names := weather.GetAvailableStationName()
+	t.Log(names)
+	if count := len(names); count != 2 {
+		t.Logf("Should have 2 station name. Expect 2, got %d", count)
+	}
+}
