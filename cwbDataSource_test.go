@@ -65,6 +65,6 @@ func TestParseLocation(t *testing.T) {
 func TestLoadData(t *testing.T) {
 	t.Skip()
 	weather.cwbDataSource = &cwbDataSource{os.Getenv("cwbAPIKey")}
-	dataSet := weather.cwbDataSource.loadDataSet(StationStatusDataId)
+	dataSet := weather.cwbDataSource.loadDataSet(StationStatusDataID)
 	t.Log(string(dataSet.RawData))
 }
