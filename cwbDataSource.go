@@ -37,13 +37,13 @@ func (cwb cwbDataSource) loadDataSet(dataID string) (result cwbDataSet) {
 }
 
 type rawWeatherElement struct {
-	ElementName  string  `xml:"elementName"`
-	ElementValue float64 `xml:"elementValue>value"`
+	ElementName  string      `xml:"elementName"`
+	ElementValue interface{} `xml:"elementValue>value"`
 }
 
 type stationStatus struct {
 	LocationName    string
-	WeatherElements map[string]float64
+	WeatherElements map[string]interface{}
 }
 
 type rawStationStatus struct {
@@ -73,8 +73,8 @@ func (status *rawStationStatus) Convert() (converted stationStatus) {
 	return
 }
 
-func (status rawStationStatus) ToMap() (elemMap map[string]float64) {
-	elemMap = make(map[string]float64)
+func (status rawStationStatus) ToMap() (elemMap map[string]interface{}) {
+	elemMap = make(map[string]interface{})
 	for _, element := range status.RawWeatherElement {
 		elemMap[element.ElementName] = element.ElementValue
 	}
