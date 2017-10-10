@@ -24,7 +24,7 @@ func initDataSource(apiKey string) cwbDataSource {
 
 func (cwb cwbDataSource) loadDataSet(dataID string) (result cwbDataSet) {
 	result = cwbDataSet{DataID: dataID}
-	response, err := http.Get(fmt.Sprintf("%s?dataid=%s&authorizationKey=%s", ApiUrl, dataID, cwb.APIKey))
+	response, err := http.Get(fmt.Sprintf("%s?dataid=%s&authorizationkey=%s", ApiUrl, dataID, cwb.APIKey))
 	if err != nil {
 		log.Fatal(err)
 		return

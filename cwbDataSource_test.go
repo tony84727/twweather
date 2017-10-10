@@ -3,6 +3,7 @@ package twweather
 import (
 	"encoding/xml"
 	"fmt"
+	"os"
 	"testing"
 )
 
@@ -66,4 +67,11 @@ func TestParseLocation(t *testing.T) {
 		t.Fail()
 	}
 	matchExampleElements(t, station)
+}
+
+func TestLoadData(t *testing.T) {
+	t.Skip()
+	weather.cwbDataSource = &cwbDataSource{os.Getenv("cwbAPIKey")}
+	dataSet := weather.cwbDataSource.loadDataSet(StationStatusDataId)
+	t.Log(string(dataSet.RawData))
 }
