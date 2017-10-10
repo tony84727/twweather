@@ -2,6 +2,7 @@ package twweather
 
 import (
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"os"
 	"testing"
@@ -27,19 +28,11 @@ func init() {
 	exampleElements["H_FXT"] = -99
 }
 
-type TestError struct {
-	Message string
+func createTestError(format string, params ...interface{}) error {
+	return errors.New(fmt.Sprintf(format, params))
 }
 
-func (err TestError) Error() string {
-	return err.Message
-}
-
-func createTestError(format string, params ...interface{}) *TestError {
-	return &TestError{fmt.Sprintf(format, params)}
-}
-
-func matchExampleElements(t *testing.T, location *rawStationStatus) *TestError {
+func matchExampleElements(t *testing.T, location *rawStationStatus) error {
 	convertedLocation := location.Convert()
 
 	for name, expected := range exampleElements {

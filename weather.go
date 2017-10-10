@@ -2,6 +2,7 @@ package twweather
 
 import (
 	"encoding/xml"
+	"errors"
 	"reflect"
 )
 
@@ -31,7 +32,7 @@ func (weather *Weather) GetAvailableStationName() []string {
 
 func (weather *Weather) LoadStationStatus() (err error) {
 	if weather.cwbDataSource == nil {
-		err = LoadError{"cwbDataSource haven't initialized"}
+		err = errors.New("cwbDataSource haven't initialized")
 		return
 	}
 	stationDataSet := weather.cwbDataSource.loadDataSet(StationStatusDataId)
@@ -48,12 +49,4 @@ func (weather *Weather) UpdateStationStatusWithData(data []byte) (err error) {
 	}
 	weather.stationStatus = _rawStationList.Convert()
 	return
-}
-
-type LoadError struct {
-	Message string
-}
-
-func (err LoadError) Error() string {
-	return err.Message
 }
