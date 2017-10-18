@@ -2,6 +2,7 @@ package twweather
 
 import (
 	"bytes"
+	"encoding/xml"
 	"fmt"
 	"log"
 	"net/http"
@@ -36,47 +37,81 @@ func (cwb cwbDataSource) loadDataSet(dataID string) (result cwbDataSet) {
 	return
 }
 
-type rawWeatherElement struct {
-	ElementName  string      `xml:"elementName"`
-	ElementValue interface{} `xml:"elementValue>value"`
-}
+type StationStatus struct {
+	StationName string
+	CityName    string
+	CitySN      int
+	TownName    string
+	TownSN      int
 
-type stationStatus struct {
-	LocationName    string
+	latitude  float64
+	longitude float64
+
 	WeatherElements map[string]interface{}
 }
 
-type rawStationStatus struct {
-	LocationName      string              `xml:"locationName"`
-	RawWeatherElement []rawWeatherElement `xml:"weatherElement"`
+type StationList struct {
+	Locations map[string]StationStatus `xml:"location"`
 }
 
-type rawStationList struct {
-	Locations []rawStationStatus `xml:"location"`
-}
-
-type stationList struct {
-	Locations map[string]stationStatus
-}
-
-func (raw *rawStationList) Convert() *stationList {
-	list := make(map[string]stationStatus, 11)
-	for _, rawElem := range raw.Locations {
-		list[rawElem.LocationName] = rawElem.Convert()
+func (status *StationStatus) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	raw := new(struct {
+		StationName     string  `xml:"locationName"`
+		Latitude        float64 `xml:"lat"`
+		Longitude       float64 `xml:"lon"`
+		WeatherElements []struct {
+			Name  string      `xml:"elementName"`
+			Value interface{} `xml:"elementValue>value"`
+		} `xml:"weatherElement"`
+		Parameters []struct {
+			Name  string      `xml:"parameterName"`
+			Value interface{} `xml:"parameterValue"`
+		} `xml:"parameter"`
+	})
+	err := d.DecodeElement(raw, &start)
+	if err != nil {
+		return err
 	}
-	return &stationList{list}
-}
-
-func (status *rawStationStatus) Convert() (converted stationStatus) {
-	converted.LocationName = status.LocationName
-	converted.WeatherElements = status.ToMap()
-	return
-}
-
-func (status rawStationStatus) ToMap() (elemMap map[string]interface{}) {
-	elemMap = make(map[string]interface{})
-	for _, element := range status.RawWeatherElement {
-		elemMap[element.ElementName] = element.ElementValue
+	status.StationName = raw.StationName
+	status.latitude = raw.Latitude
+	status.longitude = raw.Longitude
+	// init map
+	status.WeatherElements = make(map[string]interface{}, 11)
+	for _, element := range raw.WeatherElements {
+		status.WeatherElements[element.Name] = element.Value
+		log.Printf("Add elment %s => %v", element.Name, element)
 	}
-	return
+	// for _, parameter := range raw.Parameters {
+	// 	switch parameter.Name {
+	// 	case "CITY":
+	// 		status.CityName = parameter.Value.(string)
+	// 		break
+	// 	case "CITY_SN":
+	// 		status.CitySN = parameter.Value.(int)
+	// 		break
+	// 	case "TOWN":
+	// 		status.TownName = parameter.Value.(string)
+	// 		break
+	// 	case "TOWN_SN":
+	// 		status.TownSN = parameter.Value.(int)
+	// 		break
+	// 	}
+	// }
+	log.Printf("%v", raw)
+	return nil
+}
+
+func (list *StationList) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	stations := new(struct {
+		Locations []StationStatus `xml:"location"`
+	})
+	err := d.DecodeElement(stations, &start)
+	if err != nil {
+		return err
+	}
+	list.Locations = make(map[string]StationStatus, 150)
+	for _, station := range stations.Locations {
+		list.Locations[station.StationName] = station
+	}
+	return nil
 }

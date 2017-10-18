@@ -2,7 +2,6 @@ package twweather
 
 import (
 	"encoding/xml"
-	"errors"
 	"fmt"
 	"os"
 	"testing"
@@ -29,14 +28,12 @@ func init() {
 }
 
 func createTestError(format string, params ...interface{}) error {
-	return errors.New(fmt.Sprintf(format, params))
+	return fmt.Errorf(fmt.Sprintf(format, params))
 }
 
-func matchExampleElements(t *testing.T, location *rawStationStatus) error {
-	convertedLocation := location.Convert()
-
+func matchExampleElements(t *testing.T, station *StationStatus) error {
 	for name, expected := range exampleElements {
-		element, ok := convertedLocation.WeatherElements[name]
+		element, ok := station.WeatherElements[name]
 		if !ok {
 			return createTestError("Element %s not found!", name)
 		}
@@ -50,16 +47,23 @@ func matchExampleElements(t *testing.T, location *rawStationStatus) error {
 
 // Test if we can unmarshal location xml with struct stationLocation
 func TestParseLocation(t *testing.T) {
-	station := new(rawStationStatus)
-	xml.Unmarshal(locationXML, &station)
-	if station.LocationName != "橫山" {
+	location := new(StationStatus)
+	err := xml.Unmarshal(locationXML, location)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if location.StationName != "橫山" {
 		t.Fail()
 	}
-	if count := len(station.RawWeatherElement); count != 11 {
+	if count := len(location.WeatherElements); count != 11 {
 		t.Logf("weather element count of the sample location should be 11. Got %d", count)
 		t.Fail()
 	}
-	matchExampleElements(t, station)
+	matchExampleElements(t, location)
+}
+
+func TestParseList(t *testing.T) {
+
 }
 
 func TestLoadData(t *testing.T) {
