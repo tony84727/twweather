@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
+	"time"
 )
 
 const ApiUrl = "http://opendata.cwb.gov.tw/opendataapi"
@@ -54,18 +56,46 @@ type StationList struct {
 	Locations map[string]StationStatus `xml:"location"`
 }
 
+type rawWeatherElement struct {
+	Name  string
+	Value interface{}
+}
+
+func (rawElement *rawWeatherElement) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	const timeShowFormat = "2006-01-02T15:04:05-07:00"
+	raw := new(struct {
+		Name  string `xml:"elementName"`
+		Value string `xml:"elementValue>value"`
+	})
+	err := d.DecodeElement(raw, &start)
+	if err != nil {
+		return err
+	}
+	rawElement.Name = raw.Name
+
+	valStr := raw.Value
+	timeStamp, err := time.Parse(timeShowFormat, valStr)
+	if err != nil {
+		f, err := strconv.ParseFloat(valStr, 64)
+		if err != nil {
+			return err
+		}
+		rawElement.Value = f
+	} else {
+		rawElement.Value = timeStamp
+	}
+	return nil
+}
+
 func (status *StationStatus) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	raw := new(struct {
-		StationName     string  `xml:"locationName"`
-		Latitude        float64 `xml:"lat"`
-		Longitude       float64 `xml:"lon"`
-		WeatherElements []struct {
-			Name  string      `xml:"elementName"`
-			Value interface{} `xml:"elementValue>value"`
-		} `xml:"weatherElement"`
-		Parameters []struct {
-			Name  string      `xml:"parameterName"`
-			Value interface{} `xml:"parameterValue"`
+		StationName     string              `xml:"locationName"`
+		Latitude        float64             `xml:"lat"`
+		Longitude       float64             `xml:"lon"`
+		WeatherElements []rawWeatherElement `xml:"weatherElement"`
+		Parameters      []struct {
+			Name  string `xml:"parameterName"`
+			Value string `xml:"parameterValue"`
 		} `xml:"parameter"`
 	})
 	err := d.DecodeElement(raw, &start)
@@ -79,25 +109,29 @@ func (status *StationStatus) UnmarshalXML(d *xml.Decoder, start xml.StartElement
 	status.WeatherElements = make(map[string]interface{}, 11)
 	for _, element := range raw.WeatherElements {
 		status.WeatherElements[element.Name] = element.Value
-		log.Printf("Add elment %s => %v", element.Name, element)
 	}
-	// for _, parameter := range raw.Parameters {
-	// 	switch parameter.Name {
-	// 	case "CITY":
-	// 		status.CityName = parameter.Value.(string)
-	// 		break
-	// 	case "CITY_SN":
-	// 		status.CitySN = parameter.Value.(int)
-	// 		break
-	// 	case "TOWN":
-	// 		status.TownName = parameter.Value.(string)
-	// 		break
-	// 	case "TOWN_SN":
-	// 		status.TownSN = parameter.Value.(int)
-	// 		break
-	// 	}
-	// }
-	log.Printf("%v", raw)
+	for _, parameter := range raw.Parameters {
+		switch parameter.Name {
+		case "CITY":
+			status.CityName = parameter.Value
+			break
+		case "CITY_SN":
+			i, err := strconv.Atoi(parameter.Value)
+			if err == nil {
+				status.CitySN = i
+			}
+			break
+		case "TOWN":
+			status.TownName = parameter.Value
+			break
+		case "TOWN_SN":
+			i, err := strconv.Atoi(parameter.Value)
+			if err == nil {
+				status.TownSN = i
+			}
+			break
+		}
+	}
 	return nil
 }
 
