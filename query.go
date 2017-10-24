@@ -1,30 +1,29 @@
 package twweather
 
-import (
-	"fmt"
-)
+type StationMap map[string]StationStatus
 
-// GetStationByTownName returns StationStatus that is matched by provided town name
-func (weather *Weather) GetStationByTownName(townName string) (*StationStatus, error) {
+func (weather *Weather) GetStationBy(predictor func(StationStatus) bool) StationMap {
+	candidate := make(StationMap, 2)
 	for _, location := range weather.stationList.Locations {
-		if location.TownName == townName {
-			// copy
-			ret := location
-			return &ret, nil
+		if predictor(location) {
+			// return a copy
+			cp := location
+			candidate[location.StationName] = cp
 		}
 	}
-	return nil, fmt.Errorf("Cannot find station by town name = %s", townName)
+	return candidate
 }
 
-func (weather *Weather) GetStationsByCityName(cityName string) (map[string]StationStatus, error) {
-	stations := make(map[string]StationStatus, 2)
-	for _, location := range weather.stationList.Locations {
-		if location.CityName == cityName {
-			stations[location.StationName] = location
-		}
-	}
-	if len(stations) == 0 {
-		return stations, fmt.Errorf("Cannot find station by city name = %s", cityName)
-	}
-	return stations, nil
+// GetStationByCityName returns StationMap that contains stations matched by town name.
+func (weather *Weather) GetStationByTownName(townName string) StationMap {
+	return weather.GetStationBy(func(station StationStatus) bool {
+		return station.TownName == townName
+	})
+}
+
+// GetStationByCityName returns StationMap that contains stations matched by city name.
+func (weather *Weather) GetStationsByCityName(cityName string) StationMap {
+	return weather.GetStationBy(func(station StationStatus) bool {
+		return station.CityName == cityName
+	})
 }

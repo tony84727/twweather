@@ -7,9 +7,15 @@ import (
 
 func TestGetStationByTownName(t *testing.T) {
 	weather.UpdateStationStatusWithData(sampleXML)
-	station, err := weather.GetStationByTownName("橫山鄉")
-	if err != nil || station.TownSN != 78 {
-		t.Fail()
+	stationMap := weather.GetStationByTownName("橫山鄉")
+	station, ok := stationMap["橫山"]
+	if !ok {
+		t.Log(stationMap)
+		t.Error("Cannot find station 橫山")
+		if station.TownSN != 78 {
+			t.Logf("Got Town number %v", station.TownSN)
+			t.Fail()
+		}
 	}
 }
 
@@ -23,16 +29,16 @@ func testHasStation(list map[string]StationStatus, name string) error {
 
 func TestGetStationsByCityName(t *testing.T) {
 	weather.UpdateStationStatusWithData(sampleXML)
-	stations, err := weather.GetStationsByCityName("新竹縣")
+	stationMap := weather.GetStationsByCityName("新竹縣")
 	logIfError := func(err error) {
 		if err != nil {
 			t.Error(err)
 		}
 	}
-	if err != nil || len(stations) != 2 {
+	if len(stationMap) != 2 {
 		t.Fail()
 	} else {
-		logIfError(testHasStation(stations, "橫山"))
-		logIfError(testHasStation(stations, "新豐"))
+		logIfError(testHasStation(stationMap, "橫山"))
+		logIfError(testHasStation(stationMap, "新豐"))
 	}
 }
