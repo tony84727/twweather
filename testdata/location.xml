@@ -6,88 +6,88 @@
   <locationName>橫山</locationName>
   <stationId>C0D540</stationId>
   <time>
-   <obsTime>2017-10-04T16:00:00+08:00</obsTime>
+    <obsTime>2017-10-04T16:00:00+08:00</obsTime>
   </time>
   <weatherElement>
-   <elementName>ELEV</elementName>
-   <elementValue>
-    <value>227.0</value>
-   </elementValue>
+    <elementName>ELEV</elementName>
+    <elementValue>
+      <value>227.0</value>
+    </elementValue>
   </weatherElement>
   <weatherElement>
-   <elementName>WDIR</elementName>
-   <elementValue>
-    <value>56</value>
-   </elementValue>
+    <elementName>WDIR</elementName>
+    <elementValue>
+      <value>56</value>
+    </elementValue>
   </weatherElement>
   <weatherElement>
-   <elementName>WDSD</elementName>
-   <elementValue>
-    <value>1.9</value>
-   </elementValue>
+    <elementName>WDSD</elementName>
+    <elementValue>
+      <value>1.9</value>
+    </elementValue>
   </weatherElement>
   <weatherElement>
-   <elementName>TEMP</elementName>
-   <elementValue>
-    <value>26.6</value>
-   </elementValue>
+    <elementName>TEMP</elementName>
+    <elementValue>
+      <value>26.6</value>
+    </elementValue>
   </weatherElement>
   <weatherElement>
-   <elementName>HUMD</elementName>
-   <elementValue>
-    <value>0.79</value>
-   </elementValue>
+    <elementName>HUMD</elementName>
+    <elementValue>
+      <value>0.79</value>
+    </elementValue>
   </weatherElement>
   <weatherElement>
-   <elementName>PRES</elementName>
-   <elementValue>
-    <value>989.1</value>
-   </elementValue>
+    <elementName>PRES</elementName>
+    <elementValue>
+      <value>989.1</value>
+    </elementValue>
   </weatherElement>
   <weatherElement>
-   <elementName>SUN</elementName>
-   <elementValue>
-    <value>-99</value>
-   </elementValue>
+    <elementName>SUN</elementName>
+    <elementValue>
+      <value>-99</value>
+    </elementValue>
   </weatherElement>
   <weatherElement>
-   <elementName>H_24R</elementName>
-   <elementValue>
-    <value>0.0</value>
-   </elementValue>
+    <elementName>H_24R</elementName>
+    <elementValue>
+      <value>0.0</value>
+    </elementValue>
   </weatherElement>
   <weatherElement>
-   <elementName>H_FX</elementName>
-   <elementValue>
-    <value>-99</value>
-   </elementValue>
+    <elementName>H_FX</elementName>
+    <elementValue>
+      <value>-99</value>
+    </elementValue>
   </weatherElement>
   <weatherElement>
-   <elementName>H_XD</elementName>
-   <elementValue>
-    <value>-99</value>
-   </elementValue>
+    <elementName>H_XD</elementName>
+    <elementValue>
+      <value>-99</value>
+    </elementValue>
   </weatherElement>
   <weatherElement>
-   <elementName>H_FXT</elementName>
-   <elementValue>
-    <value>2017-10-19T07:29:00+08:00</value>
-   </elementValue>
+    <elementName>H_FXT</elementName>
+    <elementValue>
+      <value>2017-10-19T07:29:00+08:00</value>
+    </elementValue>
   </weatherElement>
   <parameter>
-   <parameterName>CITY</parameterName>
-   <parameterValue>新竹縣</parameterValue>
+    <parameterName>CITY</parameterName>
+    <parameterValue>新竹縣</parameterValue>
   </parameter>
   <parameter>
-   <parameterName>CITY_SN</parameterName>
-   <parameterValue>10</parameterValue>
+    <parameterName>CITY_SN</parameterName>
+    <parameterValue>10</parameterValue>
   </parameter>
   <parameter>
-   <parameterName>TOWN</parameterName>
-   <parameterValue>橫山鄉</parameterValue>
+    <parameterName>TOWN</parameterName>
+    <parameterValue>橫山鄉</parameterValue>
   </parameter>
   <parameter>
-  <parameterName>TOWN_SN</parameterName>
-   <parameterValue>078</parameterValue>
+    <parameterName>TOWN_SN</parameterName>
+    <parameterValue>078</parameterValue>
   </parameter>
- </location>
+</location>
