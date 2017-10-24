@@ -11,7 +11,7 @@ const StationStatusDataID = "O-A0001-001"
 
 // Weather store data source and loaded station status.
 type Weather struct {
-	stationStatus *StationList
+	stationList   *StationList
 	cwbDataSource *cwbDataSource
 }
 
@@ -25,7 +25,7 @@ func New(cwbAPIKey string) *Weather {
 
 // GetAvailableStationName returns a slice of available station names.
 func (weather *Weather) GetAvailableStationName() []string {
-	keys := reflect.ValueOf(weather.stationStatus.Locations).MapKeys()
+	keys := reflect.ValueOf(weather.stationList.Locations).MapKeys()
 	names := make([]string, len(keys))
 	for i := 0; i < len(keys); i++ {
 		names[i] = keys[i].String()
@@ -44,8 +44,9 @@ func (weather *Weather) LoadStationStatus() (err error) {
 	return
 }
 
+// GetStation returns a StationStatus by provided name.
 func (weather *Weather) GetStation(name string) StationStatus {
-	station := weather.stationStatus.Locations[name]
+	station := weather.stationList.Locations[name]
 	return station
 }
 
@@ -56,6 +57,6 @@ func (weather *Weather) UpdateStationStatusWithData(data []byte) (err error) {
 	if err != nil {
 		return
 	}
-	weather.stationStatus = newList
+	weather.stationList = newList
 	return
 }
