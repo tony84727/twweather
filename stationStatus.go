@@ -2,6 +2,7 @@ package twweather
 
 import (
 	"fmt"
+	"strconv"
 )
 
 type StationStatus struct {
@@ -15,6 +16,40 @@ type StationStatus struct {
 	longitude float64
 
 	WeatherElements map[string]interface{}
+}
+
+func (station StationStatus) String() string {
+	_temperture, err := station.GetTemperture(true)
+	temperture := "no data"
+	if err == nil {
+		temperture = strconv.FormatFloat(_temperture,'f',-1, 64)
+	}
+
+	_humidity, err := station.GetHumidity()
+	humidity := "no data"
+	if err == nil {
+		humidity = strconv.Itoa(_humidity) + "%"
+	}
+		
+	return fmt.Sprintf(`
+		[[Station Info]]
+		StationName: %s
+		CityName: %s
+		CitySN: %d
+		TownName: %s
+		TownSN: %d
+
+		[[Weather Info]]
+		Temperture: %s ℃
+		Humidity: %s
+`,
+		station.StationName,
+		station.CityName,
+		station.CitySN,
+		station.TownName,
+		station.TownSN,
+		temperture,
+		humidity)
 }
 
 // testWeatherElementValid tests if there's data for a weather element.
