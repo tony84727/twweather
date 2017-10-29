@@ -2,9 +2,12 @@ package twweather
 
 import (
 	"bytes"
+	"encoding/xml"
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
+	"time"
 )
 
 const ApiUrl = "http://opendata.cwb.gov.tw/opendataapi"
@@ -36,47 +39,100 @@ func (cwb cwbDataSource) loadDataSet(dataID string) (result cwbDataSet) {
 	return
 }
 
+type StationList struct {
+	Locations map[string]StationStatus `xml:"location"`
+}
+
 type rawWeatherElement struct {
-	ElementName  string  `xml:"elementName"`
-	ElementValue float64 `xml:"elementValue>value"`
+	Name  string
+	Value interface{}
 }
 
-type stationStatus struct {
-	LocationName    string
-	WeatherElements map[string]float64
-}
-
-type rawStationStatus struct {
-	LocationName      string              `xml:"locationName"`
-	RawWeatherElement []rawWeatherElement `xml:"weatherElement"`
-}
-
-type rawStationList struct {
-	Locations []rawStationStatus `xml:"location"`
-}
-
-type stationList struct {
-	Locations map[string]stationStatus
-}
-
-func (raw *rawStationList) Convert() *stationList {
-	list := make(map[string]stationStatus, 11)
-	for _, rawElem := range raw.Locations {
-		list[rawElem.LocationName] = rawElem.Convert()
+func (rawElement *rawWeatherElement) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	const timeShowFormat = "2006-01-02T15:04:05-07:00"
+	raw := new(struct {
+		Name  string `xml:"elementName"`
+		Value string `xml:"elementValue>value"`
+	})
+	err := d.DecodeElement(raw, &start)
+	if err != nil {
+		return err
 	}
-	return &stationList{list}
-}
+	rawElement.Name = raw.Name
 
-func (status *rawStationStatus) Convert() (converted stationStatus) {
-	converted.LocationName = status.LocationName
-	converted.WeatherElements = status.ToMap()
-	return
-}
-
-func (status rawStationStatus) ToMap() (elemMap map[string]float64) {
-	elemMap = make(map[string]float64)
-	for _, element := range status.RawWeatherElement {
-		elemMap[element.ElementName] = element.ElementValue
+	valStr := raw.Value
+	timeStamp, err := time.Parse(timeShowFormat, valStr)
+	if err != nil {
+		f, err := strconv.ParseFloat(valStr, 64)
+		if err != nil {
+			return err
+		}
+		rawElement.Value = f
+	} else {
+		rawElement.Value = timeStamp
 	}
-	return
+	return nil
+}
+
+func (status *StationStatus) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	raw := new(struct {
+		StationName     string              `xml:"locationName"`
+		Latitude        float64             `xml:"lat"`
+		Longitude       float64             `xml:"lon"`
+		WeatherElements []rawWeatherElement `xml:"weatherElement"`
+		Parameters      []struct {
+			Name  string `xml:"parameterName"`
+			Value string `xml:"parameterValue"`
+		} `xml:"parameter"`
+	})
+	err := d.DecodeElement(raw, &start)
+	if err != nil {
+		return err
+	}
+	status.StationName = raw.StationName
+	status.latitude = raw.Latitude
+	status.longitude = raw.Longitude
+	// init map
+	status.WeatherElements = make(map[string]interface{}, 11)
+	for _, element := range raw.WeatherElements {
+		status.WeatherElements[element.Name] = element.Value
+	}
+	for _, parameter := range raw.Parameters {
+		switch parameter.Name {
+		case "CITY":
+			status.CityName = parameter.Value
+			break
+		case "CITY_SN":
+			i, err := strconv.Atoi(parameter.Value)
+			if err == nil {
+				status.CitySN = i
+			}
+			break
+		case "TOWN":
+			status.TownName = parameter.Value
+			break
+		case "TOWN_SN":
+			i, err := strconv.Atoi(parameter.Value)
+			if err == nil {
+				status.TownSN = i
+			}
+			break
+		}
+	}
+	return nil
+}
+
+func (list *StationList) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	stations := new(struct {
+		Locations []StationStatus `xml:"location"`
+	})
+	err := d.DecodeElement(stations, &start)
+	if err != nil {
+		return err
+	}
+	list.Locations = make(map[string]StationStatus, 150)
+	for _, station := range stations.Locations {
+		list.Locations[station.StationName] = station
+	}
+	return nil
 }
