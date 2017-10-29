@@ -4,7 +4,13 @@ import "testing"
 
 func TestGetTemperture(t *testing.T) {
 	weather.UpdateStationStatusWithData(sampleXML)
-	station := weather.GetStation("橫山")
+	station, err := weather.GetStation("橫山")
+
+	if err != nil {
+		t.Log(err)
+		t.Fail()
+		return
+	}
 
 	temperture, err := station.GetTemperture(true)
 
@@ -22,7 +28,12 @@ func TestGetTemperture(t *testing.T) {
 
 func TesttestWeatherElementValid(t *testing.T) {
 	weather.UpdateStationStatusWithData(sampleXML)
-	station := weather.GetStation("橫山")
+	station, err := weather.GetStation("橫山")
+	if err != nil {
+		t.Log(err)
+		t.Fail()
+		return
+	}
 	isValid := station.testWeatherElementValid("SUM")
 	if isValid {
 		t.Errorf("SUM data of 橫山 should be invalid")
