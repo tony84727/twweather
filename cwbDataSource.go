@@ -39,19 +39,6 @@ func (cwb cwbDataSource) loadDataSet(dataID string) (result cwbDataSet) {
 	return
 }
 
-type StationStatus struct {
-	StationName string
-	CityName    string
-	CitySN      int
-	TownName    string
-	TownSN      int
-
-	latitude  float64
-	longitude float64
-
-	WeatherElements map[string]interface{}
-}
-
 type StationList struct {
 	Locations map[string]StationStatus `xml:"location"`
 }
