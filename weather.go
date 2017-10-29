@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"reflect"
+	"fmt"
 )
 
 // StationStatusDataID is dataid of cwb opendata API.
@@ -45,9 +46,12 @@ func (weather *Weather) LoadStationStatus() (err error) {
 }
 
 // GetStation returns a StationStatus by provided name.
-func (weather *Weather) GetStation(name string) StationStatus {
-	station := weather.stationList.Locations[name]
-	return station
+func (weather *Weather) GetStation(name string) (station StationStatus,err error) {
+	station, ok := weather.stationList.Locations[name]
+	if !ok {
+		err = fmt.Errorf("cannot find station %s",name)
+	}
+	return
 }
 
 // UpdateStationStatusWithData update station status with a slice of byte.
