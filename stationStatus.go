@@ -22,7 +22,7 @@ func (station StationStatus) String() string {
 	_temperture, err := station.GetTemperture(true)
 	temperture := "no data"
 	if err == nil {
-		temperture = strconv.FormatFloat(_temperture,'f',-1, 64)
+		temperture = strconv.FormatFloat(_temperture, 'f', -1, 64)
 	}
 
 	_humidity, err := station.GetHumidity()
@@ -30,18 +30,18 @@ func (station StationStatus) String() string {
 	if err == nil {
 		humidity = strconv.Itoa(_humidity) + "%"
 	}
-		
-	return fmt.Sprintf(`
-		[[Station Info]]
-		StationName: %s
-		CityName: %s
-		CitySN: %d
-		TownName: %s
-		TownSN: %d
 
-		[[Weather Info]]
-		Temperture: %s ℃
-		Humidity: %s
+	return fmt.Sprintf(`
+[[Station Info]]
+StationName: %s
+CityName: %s
+CitySN: %d
+TownName: %s
+TownSN: %d
+
+[[Weather Info]]
+Temperture: %s ℃
+Humidity: %s
 `,
 		station.StationName,
 		station.CityName,
