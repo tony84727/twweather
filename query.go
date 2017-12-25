@@ -2,10 +2,12 @@ package twweather
 
 type StationMap map[string]StationStatus
 
-func (weather *Weather) GetStationBy(predictor func(StationStatus) bool) StationMap {
+type StationFilter func(StationStatus) bool
+
+func (weather *Weather) GetStationBy(filter StationFilter) StationMap {
 	candidate := make(StationMap, 2)
 	for _, location := range weather.stationList.Locations {
-		if predictor(location) {
+		if filter(location) {
 			// return a copy
 			cp := location
 			candidate[location.StationName] = cp
