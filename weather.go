@@ -3,8 +3,10 @@ package twweather
 import (
 	"encoding/xml"
 	"errors"
-	"reflect"
 	"fmt"
+	"reflect"
+
+	"github.com/minecraftxwinp/twweather/cwbdata"
 )
 
 // StationStatusDataID is dataid of cwb opendata API.
@@ -13,14 +15,15 @@ const StationStatusDataID = "O-A0001-001"
 // Weather store data source and loaded station status.
 type Weather struct {
 	stationList   *StationList
-	cwbDataSource *cwbDataSource
+	cwbDataSource *cwbdata.CwbDataSource
 }
 
 // New return a initial weather struct without loading anything.
 func New(cwbAPIKey string) *Weather {
 	// create cwbDataSource
 	weather := new(Weather)
-	weather.cwbDataSource = &cwbDataSource{cwbAPIKey}
+	dataSource := cwbdata.InitDataSource(cwbAPIKey)
+	weather.cwbDataSource = &dataSource
 	return weather
 }
 
@@ -40,16 +43,16 @@ func (weather *Weather) LoadStationStatus() (err error) {
 		err = errors.New("cwbDataSource haven't initialized")
 		return
 	}
-	stationDataSet := weather.cwbDataSource.loadDataSet(StationStatusDataID)
+	stationDataSet := weather.cwbDataSource.LoadDataSet(StationStatusDataID)
 	err = weather.UpdateStationStatusWithData(stationDataSet.RawData)
 	return
 }
 
 // GetStation returns a StationStatus by provided name.
-func (weather *Weather) GetStation(name string) (station StationStatus,err error) {
+func (weather *Weather) GetStation(name string) (station StationStatus, err error) {
 	station, ok := weather.stationList.Locations[name]
 	if !ok {
-		err = fmt.Errorf("cannot find station %s",name)
+		err = fmt.Errorf("cannot find station %s", name)
 	}
 	return
 }

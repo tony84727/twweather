@@ -1,6 +1,13 @@
 {
 	"comment": "",
 	"ignore": "test",
-	"package": [],
+	"package": [
+		{
+			"checksumSHA1": "yR0rHKKiLZLEhc5slDV1+GPrkvs=",
+			"path": "github.com/minecraftxwinp/twweather/cwbdata",
+			"revision": "fc01292867f04ae3e5b8d58d9be2594f00c32e72",
+			"revisionTime": "2017-12-26T04:40:44Z"
+		}
+	],
 	"rootPath": "github.com/minecraftxwinp/twweather"
 }
