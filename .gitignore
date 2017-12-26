@@ -15,3 +15,4 @@
 
 # vscode metadata
 /.vscode
+/vendor/*/
