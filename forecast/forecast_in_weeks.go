@@ -15,3 +15,6 @@ func getTwoWeekDatasetID(city int) string {
 func getOneWeekDatasetID(city int) string {
 	return "F-D0047-0" + calcWeeklyForecastDatasetID(3, city)
 }
+
+type WeelyForecast struct {
+}
