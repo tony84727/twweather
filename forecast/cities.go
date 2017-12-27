@@ -1,26 +1,26 @@
 package forecast
 
 const (
-	YILAN_COUNTY = iota
-	TAOYUAN_COUNTY
-	HSINCHU_COUNTY
-	MIAOLI_COUNTY
-	CHANGHUA_COUNTY
-	NANTOU_COUNTY
-	YUNLIN_COUNTY
-	CHIAYI_COUNTY
-	PINGTUNG_COUNTY
-	TAITUNG_COUNTY
-	HUALIEN_COUNTY
-	PENGHU_COUNTY
-	KEELUNG_CITY
-	HSINCHU_CITY
-	CHIAYI_CITY
-	TAIPAI_CITY
-	KAOHSIUNG_CITY
-	NEW_TAPIPEI_CITY
-	TAICHUNG_CITY
-	TAINAN_CITY
-	LIENCHIANG_COUNTY
-	KINMEN_COUNTY
+	YilanCounty = iota
+	TaoyuanCounty
+	HsinchuCounty
+	MiaoliCounty
+	ChanghuaCounty
+	NantouCounty
+	YunlinCounty
+	ChiayiCounty
+	PingtungCounty
+	TaitungCounty
+	HualienCounty
+	PenghuCounty
+	KeelungCity
+	HsinchuCity
+	ChiayiCity
+	TaipeiCity
+	KaohsiungCity
+	NewTapipeiCity
+	TaichungCity
+	TainanCity
+	LienchiangCounty
+	KinmenCounty
 )
