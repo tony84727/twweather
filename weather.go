@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/minecraftxwinp/twweather/cwbdata"
+	"github.com/MinecraftXwinP/twweather/cwbdata"
 )
 
 // StationStatusDataID is dataid of cwb opendata API.
