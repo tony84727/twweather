@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cwbopendata xmlns="urn:cwb:gov:tw:cwbcommon:0.1">
+ <identifier>
+  12ef1673-921a-bfdf-39b5-6f57f1d61a5a
+ </identifier>
+ <sender>
+  weather@cwb.gov.tw
+ </sender>
+ <sent>
+  2018-01-13T17:06:00+08:00
+ </sent>
+ <status>
+  Actual
+ </status>
+ <scope>
+  Public
+ </scope>
+ <msgType>
+  Issue
+ </msgType>
+ <dataid>
+  D0047-003
+ </dataid>
+ <source>
+  MFC
+ </source>
+ <dataset>
+    Fake dataset
+ </dataset>
+</cwbopendata>
