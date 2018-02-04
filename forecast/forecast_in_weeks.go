@@ -33,10 +33,24 @@ func GetWeeklyForecast(apiKey string, city int) (f *WeeklyForecast, err error) {
 	return
 }
 
-type timed struct {
-	Start time.Time `xml:"startTime"`
-	End   time.Time `xml:"endTime"`
+type Timed interface {
+	Start() time.Time
+	End() time.Time
 }
+
+type timed struct {
+	start time.Time `xml:"startTime"`
+	end   time.Time `xml:"endTime"`
+}
+
+func (t timed) Start() time.Time {
+	return t.start
+}
+
+func (t timed) End() time.Time {
+	return t.end
+}
+
 type stringTimed struct {
 	Start string `xml:"startTime"`
 	End   string `xml:"endTime"`
@@ -51,13 +65,13 @@ func (t *timed) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	if err != nil {
 		return err
 	}
-	t.Start = startTime
+	t.start = startTime
 
 	endTime, err := time.Parse(cwbdata.CwbTimeFormat, original.End)
 	if err != nil {
 		return err
 	}
-	t.End = endTime
+	t.end = endTime
 	return nil
 }
 
@@ -86,11 +100,11 @@ func (m *Measurement) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error
 	if err != nil {
 		return err
 	}
-	err = cwbdata.AssignTime(original.Start, &m.Start)
+	err = cwbdata.AssignTime(original.Start, &m.start)
 	if err != nil {
 		return err
 	}
-	err = cwbdata.AssignTime(original.End, &m.End)
+	err = cwbdata.AssignTime(original.End, &m.end)
 	if err != nil {
 		return err
 	}
@@ -113,37 +127,43 @@ type Description struct {
 func (desc *Description) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	original := new(struct {
 		stringTimed
-		Parameters []Parameter `xml:"time"`
+		Parameters []Parameter `xml:"parameter"`
 	})
 	err := d.DecodeElement(original, &start)
 	if err != nil {
 		return err
 	}
-	err = cwbdata.AssignTime(original.Start, &desc.Start)
+	err = cwbdata.AssignTime(original.Start, &desc.start)
 	if err != nil {
 		return err
 	}
-	err = cwbdata.AssignTime(original.End, &desc.End)
+	err = cwbdata.AssignTime(original.End, &desc.end)
 	if err != nil {
 		return err
 	}
+	desc.Parameters = original.Parameters
 	return nil
 }
 
+type Timeline []Timed
 type TimelineWeatherElement struct {
-	Name     string
-	Timeline []interface{}
+	name     string
+	timeline Timeline
+}
+
+func (te TimelineWeatherElement) GetTimeline() Timeline {
+	return te.timeline
 }
 
 type timelinePart struct {
-	Data interface{}
+	Data Timed
 }
 
 func (tp *timelinePart) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	// try unmarshal measurement
 	measurement := &Measurement{}
 	err := d.DecodeElement(measurement, &start)
-	if err == nil {
+	if err == nil && len(measurement.Unit) != 0 {
 		tp.Data = measurement
 		return nil
 	}
@@ -165,11 +185,11 @@ func (te *TimelineWeatherElement) UnmarshalXML(d *xml.Decoder, start xml.StartEl
 	if err != nil {
 		return err
 	}
-	timeline := make([]interface{}, 0, 1)
+	timeline := make([]Timed, 0, 1)
 	for _, tp := range original.Time {
 		timeline = append(timeline, tp.Data)
 	}
-	te.Timeline = timeline
+	te.timeline = timeline
 	return nil
 }
 
