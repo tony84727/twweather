@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"testing"
 	"time"
+
+	"github.com/MinecraftXwinP/twweather/testutil"
 )
 
 var (
@@ -12,6 +14,14 @@ var (
 	locationXML     []byte
 	exampleElements = make(map[string]interface{})
 )
+
+func TestMain(m *testing.M) {
+	// load sample data
+	sampleXML = testutil.Load("sample.xml")
+	locationXML = testutil.Load("location.xml")
+	weather = New("FAKEKEY")
+	m.Run()
+}
 
 func init() {
 	exampleElements["ELEV"] = float64(227)
