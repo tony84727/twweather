@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/xml"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 )
@@ -12,6 +11,9 @@ import (
 const ApiUrl = "http://opendata.cwb.gov.tw/opendataapi"
 const CwbTimeFormat = "2006-01-02T15:04:05-07:00"
 
+type OpenDataSource interface {
+	GetOpenData(dateID string) (CwbOpenData, error)
+}
 type CwbDataSource struct {
 	APIKey string
 }
@@ -57,20 +59,15 @@ func (openData *CwbOpenData) UnmarshalXML(d *xml.Decoder, start xml.StartElement
 	return nil
 }
 
-func InitDataSource(apiKey string) CwbDataSource {
-	return CwbDataSource{APIKey: apiKey}
-}
-
-func (cwb CwbDataSource) LoadDataSet(dataID string) (result CwbDataSet) {
-	result = CwbDataSet{DataID: dataID}
-	response, err := http.Get(fmt.Sprintf("%s?dataid=%s&authorizationkey=%s", ApiUrl, dataID, cwb.APIKey))
+func GetOpenData(apiKey string, dataID string) (openData CwbOpenData, err error) {
+	response, err := http.Get(fmt.Sprintf("%s?dataid=%s&authorizationkey=%s", ApiUrl, dataID, apiKey))
 	if err != nil {
-		log.Fatal(err)
 		return
 	}
 	buffer := new(bytes.Buffer)
 	defer response.Body.Close()
 	buffer.ReadFrom(response.Body)
-	result.RawData = buffer.Bytes()
+	openData = CwbOpenData{}
+	err = xml.Unmarshal(buffer.Bytes(), &openData)
 	return
 }
