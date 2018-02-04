@@ -9,7 +9,21 @@ import (
 )
 
 const ApiUrl = "http://opendata.cwb.gov.tw/opendataapi"
-const CwbTimeFormat = "2006-01-02T15:04:05-07:00"
+const CwbTimeFormat = time.RFC3339
+
+func ParseTime(timeString string) (t time.Time, err error) {
+	t, err = time.Parse(CwbTimeFormat, timeString)
+	return
+}
+
+func AssignTime(timeString string, to *time.Time) error {
+	t, err := ParseTime(timeString)
+	if err != nil {
+		return err
+	}
+	*to = t
+	return nil
+}
 
 type OpenDataSource interface {
 	GetOpenData(dateID string) (CwbOpenData, error)
