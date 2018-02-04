@@ -1,11 +1,48 @@
 package twweather
 
 import (
+	"github.com/MinecraftXwinP/twweather/cwbdata"
 	"encoding/xml"
 	"fmt"
 	"strconv"
 	"time"
 )
+const StationStatusDataID = "O-A0001-001"
+type StationStatusList map[string]StationStatus
+
+func (list *StationStatusList) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	origin := new(struct {
+		Locations StationStatus `xml:"location"`
+	})
+
+	err := d.DecodeElement(origin, &start)
+	if err != nil {
+		return err
+	}
+	for _, location := range origin.Locations {
+		list[location.StationName] = location
+	}
+	return nil
+}
+func GetStationList(dataSource cwbdata.OpenDataSource) *StationStatusList,error {
+	openData,err := dataSource.GetOpenData(StationStatusDataID)
+	if err != nil {
+		return nil,err
+	}
+	list := make(StationStatusList, 100)
+	err = xml.Unmarshal(openData.DataSet, &list)
+	return list,err
+
+}
+
+
+func (list *StationStatusList) GetAvailableStationNames() []string {
+	names := make([]string,100)
+	for name,_ := range list {
+		names[] = name
+	}
+	return names
+}
 
 type StationStatus struct {
 	StationName string
@@ -155,10 +192,6 @@ func (s *StationStatus) GetMaximumWindSpeed() (speed float64, err error) {
 	return
 }
 
-type StationList struct {
-	Locations map[string]StationStatus `xml:"location"`
-}
-
 type rawWeatherElement struct {
 	Name  string
 	Value interface{}
@@ -234,21 +267,6 @@ func (status *StationStatus) UnmarshalXML(d *xml.Decoder, start xml.StartElement
 			}
 			break
 		}
-	}
-	return nil
-}
-
-func (list *StationList) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	stations := new(struct {
-		Locations []StationStatus `xml:"location"`
-	})
-	err := d.DecodeElement(stations, &start)
-	if err != nil {
-		return err
-	}
-	list.Locations = make(map[string]StationStatus, 150)
-	for _, station := range stations.Locations {
-		list.Locations[station.StationName] = station
 	}
 	return nil
 }
