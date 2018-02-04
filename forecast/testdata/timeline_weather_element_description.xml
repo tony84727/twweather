@@ -1,0 +1,24 @@
+<weatherElement>
+    <elementName>
+      Wind
+    </elementName>
+    <time>
+        <startTime>
+            2018-02-03T18:00:00+08:00
+        </startTime>
+        <endTime>
+            2018-02-04T06:00:00+08:00
+        </endTime>
+        <parameter>
+            <parameterName>
+                風向縮寫
+            </parameterName>
+            <parameterValue>
+                NE
+            </parameterValue>
+            <parameterUnit>
+                16方位
+            </parameterUnit>
+        </parameter>
+    </time>
+</weatherElement>

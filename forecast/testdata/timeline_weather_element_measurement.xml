@@ -1,0 +1,21 @@
+<weatherElement>
+    <elementName>
+        Temperture
+    </elementName>
+    <time>
+        <startTime>
+            2018-02-03T18:00:00+08:00
+        </startTime>
+        <endTime>
+            2018-02-04T06:00:00+08:00
+        </endTime>
+        <elementValue>
+            <value>
+                9
+            </value>
+            <measures>
+                C
+            </measures>
+        </elementValue>
+    </time>
+</weatherElement>
