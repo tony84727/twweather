@@ -24,7 +24,7 @@ func ExampleGetMeasurement() {
 	}
 	for _, timed := range te.GetTimeline() {
 		printTimedTimestamps(timed)
-		measurement := timed.(*Measurement)
+		measurement := timed.Data[0].(*Measurement)
 		fmt.Println(measurement.Value)
 		fmt.Println(measurement.Unit)
 	}
@@ -44,9 +44,9 @@ func getTimelineWeatherElementFrom(path string) (*TimelineWeatherElement, error)
 	return te, nil
 }
 
-func printTimedTimestamps(t Timed) {
-	fmt.Println(t.Start().Format(time.RFC3339))
-	fmt.Println(t.End().Format(time.RFC3339))
+func printTimedTimestamps(t *Timed) {
+	fmt.Println(t.Start.Format(time.RFC3339))
+	fmt.Println(t.End.Format(time.RFC3339))
 }
 
 func printParameter(p Parameter) {
@@ -55,22 +55,22 @@ func printParameter(p Parameter) {
 	fmt.Println(p.Unit)
 }
 
-func ExampleGetDescription() {
+func ExampleGetParameter() {
 	te, err := getTimelineWeatherElementFrom("timeline_weather_element_description.xml")
 	if err != nil {
 		log.Panic(err.Error())
 	}
 	for _, timed := range te.GetTimeline() {
-		desc := timed.(*Description)
-		printTimedTimestamps(desc)
-		for _, parameter := range desc.Parameters {
-			printParameter(parameter)
-		}
+		p := timed.Data[0].(*Parameter)
+		printTimedTimestamps(timed)
+		fmt.Println(p.Name)
+		fmt.Println(p.Unit)
+		fmt.Println(p.Value)
 	}
 	// Output:
 	// 2018-02-03T18:00:00+08:00
 	// 2018-02-04T06:00:00+08:00
 	// 風向縮寫
-	// NE
 	// 16方位
+	// NE
 }
