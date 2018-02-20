@@ -46,7 +46,7 @@ type CwbOpenData struct {
 	MsgType    string    `xml:"msgType"`
 	DataID     string    `xml:"dataid"`
 	Source     string    `xml:"source"`
-	DataSet    []byte    `xml:"dataset,innerXML"`
+	DataSet    []byte
 }
 
 func (openData *CwbOpenData) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
@@ -59,7 +59,9 @@ func (openData *CwbOpenData) UnmarshalXML(d *xml.Decoder, start xml.StartElement
 		MsgType    string `xml:"msgType"`
 		DataID     string `xml:"dataid"`
 		Source     string `xml:"source"`
-		DataSet    []byte `xml:"dataset,innerXML"`
+		DataSet    struct {
+			Data []byte `xml:",innerxml"`
+		} `xml:"dataset"`
 	})
 	err := d.DecodeElement(original, &start)
 	if err != nil {
@@ -73,7 +75,9 @@ func (openData *CwbOpenData) UnmarshalXML(d *xml.Decoder, start xml.StartElement
 	openData.MsgType = original.MsgType
 	openData.DataID = original.DataID
 	openData.Source = original.Source
-	openData.DataSet = original.DataSet
+	dataset := append([]byte("<dataset>"), original.DataSet.Data...)
+	dataset = append(dataset, []byte("</dataset>")...)
+	openData.DataSet = dataset
 	err = AssignTime(original.Sent, &openData.Sent)
 	if err != nil {
 		return err

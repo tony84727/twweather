@@ -2,6 +2,7 @@ package cwbdata
 
 import (
 	"fmt"
+	"log"
 	"testing"
 
 	"github.com/MinecraftXwinP/twweather/testutil"
@@ -17,7 +18,10 @@ func testParseTime(t *testing.T) {
 
 func ExampleGetOpenDataByData() {
 	data := testutil.Load("fake_dataset.xml")
-	opendata, _ := GetOpenDataByData(data)
+	opendata, err := GetOpenDataByData(data)
+	if err != nil {
+		log.Panic(err)
+	}
 	fmt.Println(opendata.DataID)
 	fmt.Println(opendata.Identifier)
 	fmt.Println(opendata.MsgType)
@@ -36,5 +40,5 @@ func ExampleGetOpenDataByData() {
 	// 2018-01-13 17:06:00 +0800 CST
 	// MFC
 	// Actual
-	// Fake dataset
+	// <dataset><a><b>ab</b><c>ac</c></a></dataset>
 }
