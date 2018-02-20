@@ -6,6 +6,8 @@ import (
 	"log"
 	"time"
 
+	"github.com/MinecraftXwinP/twweather/cwbdata"
+
 	"github.com/MinecraftXwinP/twweather/testutil"
 )
 
@@ -73,4 +75,25 @@ func ExampleGetParameter() {
 	// 風向縮寫
 	// 16方位
 	// NE
+}
+
+func ExampleOpenDataToWeeklyForecast() {
+	data := testutil.Load("weekly_forecast_sample.xml")
+	opendata, err := cwbdata.GetOpenDataByData(data)
+	if err != nil {
+		log.Panic(err)
+	}
+	wf, err := OpenDataToWeeklyForecast(opendata)
+	if err != nil {
+		log.Panic(err)
+	}
+	fmt.Println(wf.Description)
+	fmt.Println(wf.Language)
+	fmt.Println(wf.IssueTime)
+	fmt.Println(wf.UpdateTime)
+	// Output:
+	// 宜蘭縣未來1週天氣預報
+	// zh-TW
+	// 2018-01-13 17:00:00 +0800 CST
+	// 2018-01-13 17:06:00 +0800 CST
 }

@@ -25,12 +25,17 @@ func GetWeeklyForecast(apiKey string, city int) (f *WeeklyForecast, err error) {
 	if err != nil {
 		return
 	}
-	f = new(WeeklyForecast)
-	err = xml.Unmarshal(openData.DataSet, &f)
-	if err != nil {
-		f = nil
-	}
+	f, err = OpenDataToWeeklyForecast(openData)
 	return
+}
+
+func OpenDataToWeeklyForecast(opendata cwbdata.CwbOpenData) (*WeeklyForecast, error) {
+	wf := new(WeeklyForecast)
+	err := xml.Unmarshal(opendata.DataSet, wf)
+	if err != nil {
+		return nil, err
+	}
+	return wf, nil
 }
 
 type Timed struct {
@@ -106,10 +111,47 @@ func (te TimelineWeatherElement) GetTimeline() Timeline {
 }
 
 type WeeklyForecast struct {
-	Name            string
-	Names           []string
-	Geocode         string
-	latitude        float32
-	longitude       float32
-	WeatherElements []TimelineWeatherElement
+	Description        string
+	Language           string
+	IssueTime          time.Time
+	UpdateTime         time.Time
+	ContentDescription string
+	Locations          []Location
+}
+
+func (wf *WeeklyForecast) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	original := new(struct {
+		Description        string     `xml:"datasetInfo>datasetDescription"`
+		Language           string     `xml:"datasetInfo>datasetLanguage"`
+		IssueTime          string     `xml:"datasetInfo>issueTime"`
+		UpdateTime         string     `xml:"datasetInfo>update"`
+		ContentDescription string     `xml:"contents>contentDescription"`
+		LocationName       string     `xml:"locations>locationsName"`
+		Locations          []Location `xml:"locations>location"`
+	})
+	err := d.DecodeElement(original, &start)
+	if err != nil {
+		return err
+	}
+	wf.Description = original.Description
+	wf.Language = original.Language
+	err = cwbdata.AssignTime(original.IssueTime, &wf.IssueTime)
+	if err != nil {
+		return err
+	}
+	err = cwbdata.AssignTime(original.UpdateTime, &wf.UpdateTime)
+	if err != nil {
+		return err
+	}
+	wf.ContentDescription = original.ContentDescription
+	wf.Locations = original.Locations
+	return nil
+}
+
+type Location struct {
+	Name            string                   `xml:"locationName"`
+	Geocode         string                   `xml:"geocode"`
+	Latitude        float32                  `xml:"lat"`
+	Longitude       float32                  `xml:"lon"`
+	WeatherElements []TimelineWeatherElement `xml:"weatherElement"`
 }
