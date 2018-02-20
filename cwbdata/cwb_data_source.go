@@ -48,31 +48,46 @@ type CwbOpenData struct {
 	Source     string    `xml:"source"`
 	DataSet    []byte    `xml:"dataset,innerXML"`
 }
-type rawCwbOpenData struct {
-	CwbOpenData
-	Sent string `xml:"sent"`
-}
 
 func (openData *CwbOpenData) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	origin := new(rawCwbOpenData)
-	d.DecodeElement(origin, &start)
-
-	openData.Identifier = origin.Identifier
-	openData.Sender = origin.Sender
-	openData.Status = origin.Status
-	openData.Scope = origin.Scope
-	openData.MsgType = origin.MsgType
-	openData.DataID = origin.DataID
-	openData.Source = origin.Source
-	openData.DataSet = origin.DataSet
-	timeStamp, err := time.Parse(CwbTimeFormat, origin.Sent)
+	original := new(struct {
+		Identifier string `xml:"identifier"`
+		Sender     string `xml:"sender"`
+		Sent       string `xml:"sent"`
+		Status     string `xml:"status"`
+		Scope      string `xml:"scope"`
+		MsgType    string `xml:"msgType"`
+		DataID     string `xml:"dataid"`
+		Source     string `xml:"source"`
+		DataSet    []byte `xml:"dataset,innerXML"`
+	})
+	err := d.DecodeElement(original, &start)
 	if err != nil {
 		return err
 	}
-	openData.Sent = timeStamp
+
+	openData.Identifier = original.Identifier
+	openData.Sender = original.Sender
+	openData.Status = original.Status
+	openData.Scope = original.Scope
+	openData.MsgType = original.MsgType
+	openData.DataID = original.DataID
+	openData.Source = original.Source
+	openData.DataSet = original.DataSet
+	err = AssignTime(original.Sent, &openData.Sent)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
+// GetOpenDataByData unmarshals data to CwbOpenData.
+func GetOpenDataByData(data []byte) (openData CwbOpenData, err error) {
+	err = xml.Unmarshal(data, &openData)
+	return
+}
+
+// GetOpenData makes API request to retrive data then pass it to GetOpenDataByData.
 func GetOpenData(apiKey string, dataID string) (openData CwbOpenData, err error) {
 	response, err := http.Get(fmt.Sprintf("%s?dataid=%s&authorizationkey=%s", ApiUrl, dataID, apiKey))
 	if err != nil {
@@ -81,7 +96,6 @@ func GetOpenData(apiKey string, dataID string) (openData CwbOpenData, err error)
 	buffer := new(bytes.Buffer)
 	defer response.Body.Close()
 	buffer.ReadFrom(response.Body)
-	openData = CwbOpenData{}
-	err = xml.Unmarshal(buffer.Bytes(), &openData)
+	openData, err = GetOpenDataByData(buffer.Bytes())
 	return
 }
