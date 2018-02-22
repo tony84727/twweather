@@ -24,7 +24,7 @@ func ExampleGetMeasurement() {
 	if err != nil {
 		log.Panic(err.Error())
 	}
-	for _, timed := range te.GetTimeline() {
+	for _, timed := range te.Timeline {
 		printTimedTimestamps(timed)
 		measurement := timed.Data[0].(*Measurement)
 		fmt.Println(measurement.Value)
@@ -62,7 +62,7 @@ func ExampleGetParameter() {
 	if err != nil {
 		log.Panic(err.Error())
 	}
-	for _, timed := range te.GetTimeline() {
+	for _, timed := range te.Timeline {
 		p := timed.Data[0].(*Parameter)
 		printTimedTimestamps(timed)
 		fmt.Println(p.Name)
