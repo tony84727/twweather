@@ -146,22 +146,17 @@ func (s *Observation) testWeatherElementValid(key string) (result bool) {
 	return true
 }
 
-func (s *Observation) getWeatherElement(key string, humanReadable string) (element interface{}, err error) {
+func (s *Observation) getWeatherElement(key string, humanReadable string) (interface{}, error) {
 	if !s.testWeatherElementValid(key) {
-		panic(fmt.Errorf("no %s data", humanReadable))
+		return nil, fmt.Errorf("no %s data", humanReadable)
 	}
-	element, _ = s.WeatherElements[key]
-	defer func() {
-		if r := recover(); r != nil {
-			err = r.(error)
-		}
-	}()
-	return
+	element, _ := s.WeatherElements[key]
+	return element, nil
 }
 
-func (s *Observation) GetTemperture(celsius bool) (tempture float64, err error) {
+func (s *Observation) GetTemperature(celsius bool) (tempture float64, err error) {
 	const key = "TEMP"
-	we, err := s.getWeatherElement(key, "temperture")
+	we, err := s.getWeatherElement(key, "temperature")
 	if err != nil {
 		tempture = -99
 		return
@@ -211,7 +206,7 @@ func (s *Observation) GetSunHours() (hours int, err error) {
 }
 
 // GetDailyRainfall returns daily rainfall of the station in millimeters.
-func (s *Observation) GetDailyRainfall(mm float64, err error) {
+func (s *Observation) GetDailyRainfall() (mm float64, err error) {
 	const key = "H_24R"
 	we, err := s.getWeatherElement(key, "daily rainfall")
 	if err != nil {

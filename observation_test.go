@@ -37,3 +37,25 @@ func TestParseObservation(t *testing.T) {
 	assert.Equal(t, "橫山鄉", observation.TownName)
 	assert.Equal(t, 78, observation.TownSN)
 }
+
+func TestObservationQueries(t *testing.T) {
+	ob := new(Observation)
+	xml.Unmarshal(locationXML, ob)
+	temp, err := ob.GetTemperature(true)
+	assert.NoError(t, err)
+	assert.Equal(t, float64(26.6), temp)
+	temp, err = ob.GetTemperature(false)
+	assert.NoError(t, err)
+	assert.Equal(t, float64(79.88), temp)
+	_, err = ob.GetSunHours()
+	assert.Error(t, err)
+	rainfail, err := ob.GetDailyRainfall()
+	assert.NoError(t, err)
+	assert.Equal(t, float64(0.0), rainfail)
+	humd, err := ob.GetHumidity()
+	assert.NoError(t, err)
+	assert.Equal(t, 79, humd)
+	pres, err := ob.GetPressure()
+	assert.NoError(t, err)
+	assert.Equal(t, float64(989.1), pres)
+}
