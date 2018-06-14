@@ -9,11 +9,13 @@ import (
 	"github.com/MinecraftXwinP/twweather/cwbdata"
 )
 
+const ObservationsDataID = "O-A0001-001"
+
 type Observations map[string]*Observation
 
-func (os *Observations) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+func (os Observations) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	origin := new(struct {
-		Locations Observation `xml:"location"`
+		Locations []Observation `xml:"location"`
 	})
 
 	err := d.DecodeElement(origin, &start)
@@ -21,7 +23,7 @@ func (os *Observations) UnmarshalXML(d *xml.Decoder, start xml.StartElement) err
 		return err
 	}
 	for _, location := range origin.Locations {
-		os[location.StationName] = location
+		os[location.StationName] = &location
 	}
 	return nil
 }
@@ -54,32 +56,32 @@ func (o *Observation) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error
 	if err != nil {
 		return err
 	}
-	status.StationName = raw.StationName
-	status.latitude = raw.Latitude
-	status.longitude = raw.Longitude
+	o.StationName = raw.StationName
+	o.latitude = raw.Latitude
+	o.longitude = raw.Longitude
 	// init map
-	status.WeatherElements = make(map[string]interface{}, 11)
+	o.WeatherElements = make(map[string]interface{}, 11)
 	for _, element := range raw.WeatherElements {
-		status.WeatherElements[element.Name] = element.Value
+		o.WeatherElements[element.Name] = element.Value
 	}
 	for _, parameter := range raw.Parameters {
 		switch parameter.Name {
 		case "CITY":
-			status.CityName = parameter.Value
+			o.CityName = parameter.Value
 			break
 		case "CITY_SN":
 			i, err := strconv.Atoi(parameter.Value)
 			if err == nil {
-				status.CitySN = i
+				o.CitySN = i
 			}
 			break
 		case "TOWN":
-			status.TownName = parameter.Value
+			o.TownName = parameter.Value
 			break
 		case "TOWN_SN":
 			i, err := strconv.Atoi(parameter.Value)
 			if err == nil {
-				status.TownSN = i
+				o.TownSN = i
 			}
 			break
 		}
@@ -88,10 +90,16 @@ func (o *Observation) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error
 }
 
 func GetObservations(apiKey string) (*Observations, error) {
-	openData, err := cwbdata.GetOpenData(apikey, StationStatusDataID)
+	openData, err := cwbdata.GetOpenData(apiKey, ObservationsDataID)
 	if err != nil {
 		return nil, err
 	}
+	obs := make(Observations, 10)
+	err = xml.Unmarshal(openData.DataSet, &obs)
+	if err != nil {
+		return nil, err
+	}
+	return &obs, nil
 }
 
 type rawWeatherElement struct {
