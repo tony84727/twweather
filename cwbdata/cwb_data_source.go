@@ -5,6 +5,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -12,7 +13,7 @@ const ApiUrl = "http://opendata.cwb.gov.tw/opendataapi"
 const CwbTimeFormat = time.RFC3339
 
 func ParseTime(timeString string) (t time.Time, err error) {
-	t, err = time.Parse(CwbTimeFormat, timeString)
+	t, err = time.Parse(CwbTimeFormat, strings.TrimSpace(timeString))
 	return
 }
 
@@ -68,13 +69,13 @@ func (openData *CwbOpenData) UnmarshalXML(d *xml.Decoder, start xml.StartElement
 		return err
 	}
 
-	openData.Identifier = original.Identifier
-	openData.Sender = original.Sender
-	openData.Status = original.Status
-	openData.Scope = original.Scope
-	openData.MsgType = original.MsgType
-	openData.DataID = original.DataID
-	openData.Source = original.Source
+	openData.Identifier = strings.TrimSpace(original.Identifier)
+	openData.Sender = strings.TrimSpace(original.Sender)
+	openData.Status = strings.TrimSpace(original.Status)
+	openData.Scope = strings.TrimSpace(original.Scope)
+	openData.MsgType = strings.TrimSpace(original.MsgType)
+	openData.DataID = strings.TrimSpace(original.DataID)
+	openData.Source = strings.TrimSpace(original.Source)
 	dataset := append([]byte("<dataset>"), original.DataSet.Data...)
 	dataset = append(dataset, []byte("</dataset>")...)
 	openData.DataSet = dataset

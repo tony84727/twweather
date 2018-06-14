@@ -24,7 +24,5 @@
  <source>
   MFC
  </source>
- <dataset>
-    Fake dataset
- </dataset>
+ <dataset><a><b>ab</b><c>ac</c></a></dataset>
 </cwbopendata>
