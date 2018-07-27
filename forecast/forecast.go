@@ -167,7 +167,6 @@ func (t *Timed) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	}
 }
 
-type Timeline = []*Timed
 type Measurement struct {
 	Value string `xml:"value"`
 	Unit  string `xml:"measures"`
@@ -181,5 +180,5 @@ type Parameter struct {
 
 type TimelineWeatherElement struct {
 	Name     string   `xml:"elementName"`
-	Timeline Timeline `xml:"time"`
+	Timeline []*Timed `xml:"time"`
 }
