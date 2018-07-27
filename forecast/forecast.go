@@ -29,7 +29,7 @@ func GetWeeklyForecast(apiKey string, city int) (f *WeeklyForecast, err error) {
 	return
 }
 
-func OpenDataToWeeklyForecast(opendata cwbdata.CwbOpenData) (*WeeklyForecast, error) {
+func OpenDataToWeeklyForecast(opendata *cwbdata.CwbOpenData) (*WeeklyForecast, error) {
 	wf := new(WeeklyForecast)
 	err := xml.Unmarshal(opendata.DataSet, wf)
 	if err != nil {
