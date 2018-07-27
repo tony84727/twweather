@@ -89,11 +89,11 @@ func ExampleOpenDataToWeeklyForecast() {
 	}
 	fmt.Println(wf.Description)
 	fmt.Println(wf.Language)
-	fmt.Println(wf.IssueTime)
-	fmt.Println(wf.UpdateTime)
+	fmt.Println(wf.IssueTime.UTC())
+	fmt.Println(wf.UpdateTime.UTC())
 	// Output:
 	// 宜蘭縣未來1週天氣預報
 	// zh-TW
-	// 2018-01-13 17:00:00 +0800 CST
-	// 2018-01-13 17:06:00 +0800 CST
+	// 2018-01-13 09:00:00 +0000 UTC
+	// 2018-01-13 09:06:00 +0000 UTC
 }

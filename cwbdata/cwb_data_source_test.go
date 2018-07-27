@@ -27,7 +27,7 @@ func ExampleGetOpenDataByData() {
 	fmt.Println(opendata.MsgType)
 	fmt.Println(opendata.Scope)
 	fmt.Println(opendata.Sender)
-	fmt.Println(opendata.Sent)
+	fmt.Println(opendata.Sent.UTC())
 	fmt.Println(opendata.Source)
 	fmt.Println(opendata.Status)
 	fmt.Println(string(opendata.DataSet))
@@ -37,7 +37,7 @@ func ExampleGetOpenDataByData() {
 	// Issue
 	// Public
 	// weather@cwb.gov.tw
-	// 2018-01-13 17:06:00 +0800 CST
+	// 2018-01-13 09:06:00 +0000 UTC
 	// MFC
 	// Actual
 	// <dataset><a><b>ab</b><c>ac</c></a></dataset>
