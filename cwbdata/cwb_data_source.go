@@ -9,8 +9,16 @@ import (
 	"time"
 )
 
+var (
+	HttpClient *http.Client
+)
+
 const ApiUrl = "http://opendata.cwb.gov.tw/opendataapi"
 const CwbTimeFormat = time.RFC3339
+
+func init() {
+	HttpClient = http.DefaultClient
+}
 
 func ParseTime(timeString string) (t time.Time, err error) {
 	t, err = time.Parse(CwbTimeFormat, strings.TrimSpace(timeString))
@@ -103,4 +111,9 @@ func GetOpenData(apiKey string, dataID string) (openData CwbOpenData, err error)
 	buffer.ReadFrom(response.Body)
 	openData, err = GetOpenDataByData(buffer.Bytes())
 	return
+}
+
+type OpenDataCache interface {
+	get(dataID string) (data *CwbOpenData, exist bool)
+	save(dataID string) (data *CwbOpenData)
 }
